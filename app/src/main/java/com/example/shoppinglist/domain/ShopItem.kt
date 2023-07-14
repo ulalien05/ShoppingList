@@ -1,8 +1,8 @@
 package com.example.shoppinglist.domain
 
 data class ShopItem (
-    val name: String,
-    val quantity: Int,
+    var name: String,
+    var quantity: Int,
     var active: Boolean,
     var id: Int = UNDEFINED_ID
 ){
