@@ -1,11 +1,6 @@
 package com.example.shoppinglist.presentation
 
 import android.os.Bundle
-import android.util.Log
-import android.view.LayoutInflater
-import android.widget.LinearLayout
-import android.widget.TextView
-import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,14 +11,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.lifecycle.ViewModelProvider
+import androidx.recyclerview.widget.RecyclerView
 import com.example.shoppinglist.R
-import com.example.shoppinglist.domain.ShopItem
 import com.example.shoppinglist.ui.theme.ShoppingListTheme
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var viewModel: MainViewModel
-    private lateinit var llShopList: LinearLayout
+    private lateinit var adapter: ShopListAdapter
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -38,11 +33,25 @@ class MainActivity : AppCompatActivity() {
             }
         }
         setContentView(R.layout.activity_main)
-        llShopList = findViewById(R.id.ll_shop_list)
+        setupRecyclerView()
         viewModel = ViewModelProvider(this)[MainViewModel::class.java]
         viewModel.shopList.observe(this) {
-            showList(it)
+            adapter.shopList = it
         }
+    }
+
+    private fun setupRecyclerView(){
+        val rvShopList = findViewById<RecyclerView>(R.id.rv_shop_list)
+        adapter = ShopListAdapter()
+        rvShopList.adapter = adapter
+        rvShopList.recycledViewPool.setMaxRecycledViews(
+            ShopListAdapter.ACTIVE_TYPE,
+            ShopListAdapter.MAX_POOL_SIZE
+        )
+        rvShopList.recycledViewPool.setMaxRecycledViews(
+            ShopListAdapter.NOT_ACTIVE_TYPE,
+            ShopListAdapter.MAX_POOL_SIZE
+        )
     }
 
     @Composable
@@ -58,27 +67,6 @@ class MainActivity : AppCompatActivity() {
     fun GreetingPreview() {
         ShoppingListTheme() {
             Greeting("Android")
-        }
-    }
-
-    private fun showList(list: List<ShopItem>) {
-        llShopList.removeAllViews()
-        for (shopItem in list) {
-            val layoutId = if (shopItem.active) {
-                R.layout.shop_item_activated
-            } else {
-                R.layout.shop_item_deactivated
-            }
-            val view = LayoutInflater.from(this).inflate(layoutId, llShopList, false)
-            val tvName = view.findViewById<TextView>(R.id.tv_name)
-            val tvCount = view.findViewById<TextView>(R.id.tv_count)
-            tvName.text = shopItem.name
-            tvCount.text = shopItem.quantity.toString()
-            llShopList.addView(view)
-            view.setOnLongClickListener {
-                viewModel.changeStateOfShopItem(shopItem)
-                true
-            }
         }
     }
 }
