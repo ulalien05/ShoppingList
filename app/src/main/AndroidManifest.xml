@@ -9,6 +9,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.AppCompat.Light">
+        <activity android:name=".presentation.ShopItemActivity"
+            android:windowSoftInputMode="adjustResize"/> <!-- adjusts the screen size as a keyboard pops up -->
         <activity
             android:name=".presentation.MainActivity"
             android:exported="true">
